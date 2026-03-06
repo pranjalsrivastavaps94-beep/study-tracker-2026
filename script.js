@@ -15,20 +15,12 @@ import {
 // =========================
 // FIREBASE CONFIG
 // =========================
-const firebaseConfig = {
-  apiKey: "YAHAN_API_KEY",
-  authDomain: "YAHAN_AUTH_DOMAIN",
-  projectId: "YAHAN_PROJECT_ID",
-  storageBucket: "YAHAN_STORAGE_BUCKET",
-  messagingSenderId: "YAHAN_MESSAGING_SENDER_ID",
-  appId: "YAHAN_APP_ID"
-};
+
 
 // =========================
 // ADMIN LOGIN
 // =========================
-const ADMIN_USERNAME = "admin";
-const ADMIN_PASSWORD = "12345678";
+const ADMIN_USERNAME = "PRANJAL SRIVASTAVA";const ADMIN_PASSWORD = "ap.pranjal_srivastava";
 
 // APP
 const app = initializeApp(firebaseConfig);
@@ -979,3 +971,4 @@ window.addEventListener("beforeunload", async () => {
     console.error(e);
   }
 });
+
