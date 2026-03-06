@@ -39,6 +39,13 @@
         <button id="showSignupBtn" class="tab-btn" type="button">Signup</button>
       </div>
 
+      <form id="loginForm" class="auth-form">
+        <div class="field-grid">
+          <div class="field">
+            <label>Username</label>
+            <input id="loginUsername" type="text" placeholder="Enter username" required />
+          </div>
+          <div class="field">
             <label>Password</label>
             <input id="loginPassword" type="password" placeholder="Enter password" required />
           </div>
@@ -53,7 +60,9 @@
             <input id="signupName" type="text" placeholder="Enter full name" required />
           </div>
           <div class="field">
-           
+            <label>Username</label>
+            <input id="signupUsername" type="text" placeholder="Create username" required />
+          </div>
           <div class="field field-full">
             <label>Password</label>
             <input id="signupPassword" type="password" placeholder="Min 6 characters" required />
@@ -63,6 +72,13 @@
       </form>
 
       <p id="authMessage" class="message"></p>
+
+      <div class="card glass" style="margin-top:16px; padding:16px;">
+        <h3 style="margin-top:0;">Admin Login</h3>
+        <p class="muted" style="margin-bottom:0;">
+          Admin username/password script.js me set hoga.
+        </p>
+      </div>
     </div>
   </div>
 
@@ -104,6 +120,15 @@
         <div class="pill">Day Study: <strong id="selectedDayHours">0.00h</strong></div>
         <div class="pill">Month Total: <strong id="selectedMonthHours">0.00h</strong></div>
         <div class="pill">Today: <strong id="todayDateLabel">-</strong></div>
+      </section>
+
+      <section id="adminPanel" class="card glass hidden">
+        <div class="card-head">
+          <h3>🛡 Admin Dashboard</h3>
+          <div class="status">ALL USERS</div>
+        </div>
+        <p class="muted">Yahan sab IDs dikhengi.</p>
+        <div id="adminUsersContainer" class="tasks-list"></div>
       </section>
 
       <section class="controls-row glass">
@@ -241,4 +266,3 @@
   <script type="module" src="script.js"></script>
 </body>
 </html>
-
