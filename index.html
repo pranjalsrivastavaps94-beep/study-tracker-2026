@@ -24,65 +24,7 @@
   <div class="bg-orb orb-2"></div>
   <div class="bg-grid"></div>
 
-  <div id="authScreen" class="screen auth-screen">
-    <div class="auth-wrap glass">
-      <div class="brand-row">
-        <img src="icon-192.png" alt="logo" class="brand-logo" />
-        <div>
-          <h1>Study Tracker 2026</h1>
-          <p>Developed by <strong>Pranjal Srivastava</strong></p>
-        </div>
-      </div>
-
-      <div class="auth-tabs">
-        <button id="showLoginBtn" class="tab-btn active" type="button">Login</button>
-        <button id="showSignupBtn" class="tab-btn" type="button">Signup</button>
-      </div>
-
-      <form id="loginForm" class="auth-form">
-        <div class="field-grid">
-          <div class="field">
-            <label>Username</label>
-            <input id="loginUsername" type="text" placeholder="Enter username" required />
-          </div>
-          <div class="field">
-            <label>Password</label>
-            <input id="loginPassword" type="password" placeholder="Enter password" required />
-          </div>
-        </div>
-        <button type="submit" class="btn primary full">Login</button>
-      </form>
-
-      <form id="signupForm" class="auth-form hidden">
-        <div class="field-grid">
-          <div class="field">
-            <label>Full Name</label>
-            <input id="signupName" type="text" placeholder="Enter full name" required />
-          </div>
-          <div class="field">
-            <label>Username</label>
-            <input id="signupUsername" type="text" placeholder="Create username" required />
-          </div>
-          <div class="field field-full">
-            <label>Password</label>
-            <input id="signupPassword" type="password" placeholder="Min 6 characters" required />
-          </div>
-        </div>
-        <button type="submit" class="btn primary full">Create Account</button>
-      </form>
-
-      <p id="authMessage" class="message"></p>
-
-      <div class="card glass" style="margin-top:16px; padding:16px;">
-        <h3 style="margin-top:0;">Admin Login</h3>
-        <p class="muted" style="margin-bottom:0;">
-          Admin username/password script.js me set hoga.
-        </p>
-      </div>
-    </div>
-  </div>
-
-  <div id="appScreen" class="screen hidden">
+  <div id="appScreen" class="screen">
     <header class="topbar glass">
       <div class="topbar-left">
         <img src="icon-192.png" alt="logo" class="top-logo" />
@@ -99,10 +41,10 @@
           <span id="liveClock">--</span>
         </div>
         <div class="pill user-pill">
-          <span id="userNameText">User</span>
+          <span id="userNameText">Guest</span>
         </div>
+        <button id="newGuestBtn" class="btn secondary" type="button">New Guest ID</button>
         <button id="enableNotificationBtn" class="btn ghost" type="button">Notifications</button>
-        <button id="logoutBtn" class="btn danger" type="button">Logout</button>
       </div>
     </header>
 
@@ -110,7 +52,7 @@
       <section class="hero glass">
         <div>
           <h1>Study Tracker 2026</h1>
-          <p class="muted">Real time study tracking, monthly graph, calendar, pomodoro, tasks, and cloud account sync.</p>
+          <p class="muted">Auto guest ID, real time study tracking, monthly graph, calendar, pomodoro, tasks, and cloud save.</p>
         </div>
       </section>
 
@@ -120,15 +62,6 @@
         <div class="pill">Day Study: <strong id="selectedDayHours">0.00h</strong></div>
         <div class="pill">Month Total: <strong id="selectedMonthHours">0.00h</strong></div>
         <div class="pill">Today: <strong id="todayDateLabel">-</strong></div>
-      </section>
-
-      <section id="adminPanel" class="card glass hidden">
-        <div class="card-head">
-          <h3>🛡 Admin Dashboard</h3>
-          <div class="status">ALL USERS</div>
-        </div>
-        <p class="muted">Yahan sab IDs dikhengi.</p>
-        <div id="adminUsersContainer" class="tasks-list"></div>
       </section>
 
       <section class="controls-row glass">
