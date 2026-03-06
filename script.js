@@ -20,12 +20,12 @@ import {
 // =========================
 // YAHAN APNA FIREBASE CONFIG PASTE KARNA HAI
 const firebaseConfig = {
-  apiKey: "PASTE_YOUR_API_KEY",
-  authDomain: "PASTE_YOUR_AUTH_DOMAIN",
-  projectId: "PASTE_YOUR_PROJECT_ID",
-  storageBucket: "PASTE_YOUR_STORAGE_BUCKET",
-  messagingSenderId: "PASTE_YOUR_MESSAGING_SENDER_ID",
-  appId: "PASTE_YOUR_APP_ID",
+  apiKey: "AIzaSyDbcuGVzrtghf00jWfNgtbIbaELHFxQGk",
+  authDomain: "study-tracker-2026-71e42.firebaseapp.com",
+  projectId: "study-tracker-2026-71e42",
+  storageBucket: "study-tracker-2026-71e42.firebasestorage.app",
+  messagingSenderId: "1083035958277",
+  appId: "1:1083035958277:web:fad1c596c84001cd5ff06c"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -823,5 +823,6 @@ window.addEventListener("beforeunload", async () => {
     console.error(e);
   }
 });
+
 
 
