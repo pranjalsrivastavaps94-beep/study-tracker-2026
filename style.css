@@ -18,7 +18,8 @@
   box-sizing: border-box;
 }
 
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
   min-height: 100%;
@@ -66,7 +67,9 @@ body {
 .bg-grid {
   position: fixed;
   inset: 0;
-  background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+  background-image:
+    linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
   background-size: 38px 38px;
   opacity: 0.18;
   z-index: 0;
@@ -175,7 +178,8 @@ body {
 }
 
 .tab-btn:hover,
-.btn:hover {
+.btn:hover,
+.small-btn:hover {
   transform: translateY(-1px);
 }
 
@@ -235,12 +239,29 @@ select:focus {
   margin-top: 14px;
 }
 
-.primary { background: linear-gradient(135deg, #2f6dff, #2563eb); }
-.success { background: linear-gradient(135deg, #10b981, #16a34a); }
-.warning { background: linear-gradient(135deg, #ff7f32, #ffb020); }
-.secondary { background: linear-gradient(135deg, #3b82f6, #2563eb); }
-.danger { background: linear-gradient(135deg, #ff5f5f, #e83939); }
-.ghost { background: rgba(255,255,255,0.08); }
+.primary {
+  background: linear-gradient(135deg, #2f6dff, #2563eb);
+}
+
+.success {
+  background: linear-gradient(135deg, #10b981, #16a34a);
+}
+
+.warning {
+  background: linear-gradient(135deg, #ff7f32, #ffb020);
+}
+
+.secondary {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+}
+
+.danger {
+  background: linear-gradient(135deg, #ff5f5f, #e83939);
+}
+
+.ghost {
+  background: rgba(255,255,255,0.08);
+}
 
 .message {
   min-height: 24px;
@@ -318,6 +339,10 @@ select:focus {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
+}
+
+#adminPanel {
+  margin-bottom: 16px;
 }
 
 .controls-row {
@@ -482,10 +507,21 @@ select:focus {
   margin-right: 6px;
 }
 
-.today-dot { background: #19c15f; }
-.selected-dot { background: #69a8ff; }
-.complete-dot { background: #22c55e; }
-.streak-dot { background: #8b5cf6; }
+.today-dot {
+  background: #19c15f;
+}
+
+.selected-dot {
+  background: #69a8ff;
+}
+
+.complete-dot {
+  background: #22c55e;
+}
+
+.streak-dot {
+  background: #8b5cf6;
+}
 
 .weekdays {
   margin-bottom: 10px;
@@ -510,6 +546,7 @@ select:focus {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  color: white;
 }
 
 .calendar-day:hover {
@@ -578,16 +615,6 @@ canvas {
     padding: 14px;
   }
 
-  .topbar,
-  .controls-row,
-  .task-form,
-  .summary-stats,
-  .pomodoro-grid,
-  .field-grid,
-  .legend-row {
-    grid-template-columns: 1fr !important;
-  }
-
   .topbar {
     flex-direction: column;
     align-items: stretch;
@@ -596,6 +623,15 @@ canvas {
   .topbar-right,
   .topbar-left {
     justify-content: center;
+  }
+
+  .controls-row,
+  .task-form,
+  .summary-stats,
+  .pomodoro-grid,
+  .field-grid,
+  .legend-row {
+    grid-template-columns: 1fr !important;
   }
 
   .weekdays,
