@@ -1,35 +1,37 @@
-             import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
-import {
-  getAuth,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  signOut,
-  onAuthStateChanged,
-  updateProfile,
-} from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
 import {
   getFirestore,
-  doc,
+  collection,
+  addDoc,
+  getDocs,
   getDoc,
-  setDoc,
+  doc,
+  updateDoc,
+  query,
+  where,
   serverTimestamp,
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 
 // =========================
 // FIREBASE CONFIG
 // =========================
-// YAHAN APNA FIREBASE CONFIG PASTE KARNA HAI
 const firebaseConfig = {
-  apiKey: "AIzaSyB_D7vIqlngfKFzepOXYihhYmztT4EzXbA",
-  authDomain: "study-tracker-2026-8272b.firebaseapp.com",
-  projectId: "study-tracker-2026-8272b",
-  storageBucket: "study-tracker-2026-8272b.firebasestorage.app",
-  messagingSenderId: "192423752414",
-  appId: "1:192423752414:web:5616247b217522aac9484f"
+  apiKey: "YAHAN_API_KEY",
+  authDomain: "YAHAN_AUTH_DOMAIN",
+  projectId: "YAHAN_PROJECT_ID",
+  storageBucket: "YAHAN_STORAGE_BUCKET",
+  messagingSenderId: "YAHAN_MESSAGING_SENDER_ID",
+  appId: "YAHAN_APP_ID"
 };
 
+// =========================
+// ADMIN LOGIN
+// =========================
+const ADMIN_USERNAME = "admin";
+const ADMIN_PASSWORD = "12345678";
+
+// APP
 const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
 const db = getFirestore(app);
 
 // DOM
@@ -43,6 +45,8 @@ const signupForm = document.getElementById("signupForm");
 const authMessage = document.getElementById("authMessage");
 const logoutBtn = document.getElementById("logoutBtn");
 const enableNotificationBtn = document.getElementById("enableNotificationBtn");
+const adminPanel = document.getElementById("adminPanel");
+const adminUsersContainer = document.getElementById("adminUsersContainer");
 
 const userNameText = document.getElementById("userNameText");
 const liveDate = document.getElementById("liveDate");
@@ -85,8 +89,10 @@ const addTaskBtn = document.getElementById("addTaskBtn");
 const tasksContainer = document.getElementById("tasksContainer");
 
 let currentUser = null;
+let currentDocId = null;
 let userDocCache = null;
 let chart = null;
+let isAdmin = false;
 
 const todayKey = getDateKey(new Date());
 let selectedDateKey = todayKey;
@@ -133,9 +139,11 @@ function monthLabel(monthKey) {
 function ensureUserShape(data) {
   return {
     profile: {
-      name: data?.profile?.name || currentUser?.displayName || "User",
-      email: data?.profile?.email || currentUser?.email || "",
+      name: data?.profile?.name || "User",
+      username: data?.profile?.username || "",
+      role: data?.profile?.role || "user",
     },
+    password: data?.password || "",
     stats: {
       totalSeconds: Number(data?.stats?.totalSeconds || 0),
       streakDays: Number(data?.stats?.streakDays || 0),
@@ -143,6 +151,7 @@ function ensureUserShape(data) {
     },
     studyByDate: data?.studyByDate || {},
     tasksByDate: data?.tasksByDate || {},
+    createdAt: data?.createdAt || null,
     updatedAt: data?.updatedAt || null,
   };
 }
@@ -181,16 +190,12 @@ function getSelectedTasks() {
 }
 
 async function saveUserDoc() {
-  if (!currentUser || !userDocCache) return;
-  const ref = doc(db, "studyTrackerUsers", currentUser.uid);
-  await setDoc(
-    ref,
-    {
-      ...userDocCache,
-      updatedAt: serverTimestamp(),
-    },
-    { merge: true }
-  );
+  if (!currentDocId || !userDocCache || isAdmin) return;
+  const ref = doc(db, "studyTrackerUsers", currentDocId);
+  await updateDoc(ref, {
+    ...userDocCache,
+    updatedAt: serverTimestamp(),
+  });
 }
 
 function setAuthMessage(msg, ok = false) {
@@ -365,9 +370,7 @@ function renderChart() {
 
   graphTitle.textContent = `${monthLabel(targetMonth)} - Daily Hours`;
 
-  if (chart) {
-    chart.destroy();
-  }
+  if (chart) chart.destroy();
 
   const ctx = document.getElementById("studyChart");
   chart = new Chart(ctx, {
@@ -390,9 +393,7 @@ function renderChart() {
       maintainAspectRatio: false,
       plugins: {
         legend: {
-          labels: {
-            color: "#e9f0ff",
-          },
+          labels: { color: "#e9f0ff" },
         },
       },
       scales: {
@@ -451,7 +452,7 @@ async function maybeUpdateStreak() {
 }
 
 async function incrementStudySecond() {
-  if (!userDocCache) return;
+  if (!userDocCache || isAdmin) return;
   userDocCache.studyByDate[selectedDateKey] = Number(userDocCache.studyByDate[selectedDateKey] || 0) + 1;
   userDocCache.stats.totalSeconds = Number(userDocCache.stats.totalSeconds || 0) + 1;
 
@@ -461,7 +462,120 @@ async function incrementStudySecond() {
   renderChart();
 }
 
-// AUTH
+function showAppScreen() {
+  authScreen.classList.add("hidden");
+  appScreen.classList.remove("hidden");
+}
+
+function showAuthScreen() {
+  authScreen.classList.remove("hidden");
+  appScreen.classList.add("hidden");
+}
+
+function saveSession(data) {
+  localStorage.setItem("studyTrackerSession", JSON.stringify(data));
+}
+
+function getSession() {
+  try {
+    return JSON.parse(localStorage.getItem("studyTrackerSession") || "null");
+  } catch {
+    return null;
+  }
+}
+
+function clearSession() {
+  localStorage.removeItem("studyTrackerSession");
+}
+
+async function loadAdminDashboard() {
+  adminUsersContainer.innerHTML = `<div class="task-item"><div class="task-name">Loading users...</div></div>`;
+
+  const snap = await getDocs(collection(db, "studyTrackerUsers"));
+  const users = [];
+  snap.forEach((docSnap) => {
+    const data = ensureUserShape(docSnap.data());
+    users.push({
+      id: docSnap.id,
+      name: data.profile.name,
+      username: data.profile.username,
+      totalSeconds: data.stats.totalSeconds,
+      streakDays: data.stats.streakDays,
+    });
+  });
+
+  if (!users.length) {
+    adminUsersContainer.innerHTML = `<div class="task-item"><div class="task-name">No users found</div></div>`;
+    return;
+  }
+
+  adminUsersContainer.innerHTML = users.map((u, index) => `
+    <div class="task-item">
+      <div class="task-top">
+        <div>
+          <div class="task-name">${index + 1}. ${escapeHtml(u.name)}</div>
+          <div class="task-meta">Username: ${escapeHtml(u.username)}</div>
+          <div class="task-meta">Total Study: ${secondsToHM(u.totalSeconds)} | Streak: ${u.streakDays} days</div>
+        </div>
+        <div class="pill">ID</div>
+      </div>
+    </div>
+  `).join("");
+}
+
+async function loginAsAdmin() {
+  isAdmin = true;
+  currentUser = {
+    profile: {
+      name: "Admin",
+      username: ADMIN_USERNAME,
+      role: "admin",
+    },
+  };
+  currentDocId = null;
+  userDocCache = ensureUserShape({
+    profile: {
+      name: "Admin",
+      username: ADMIN_USERNAME,
+      role: "admin",
+    },
+  });
+
+  userNameText.textContent = "Admin";
+  selectedDateKey = todayKey;
+  selectedMonthKey = todayKey.slice(0, 7);
+  ensureSelectedMonthAndDateInputs();
+  updateStopwatchUI();
+  updatePomodoroUI();
+  updateSummaryUI();
+  renderCalendar();
+  renderTasks();
+  renderChart();
+  adminPanel.classList.remove("hidden");
+  await loadAdminDashboard();
+  showAppScreen();
+  saveSession({ type: "admin" });
+}
+
+async function loginAsUser(docId, data) {
+  isAdmin = false;
+  currentDocId = docId;
+  userDocCache = ensureUserShape(data);
+  currentUser = userDocCache;
+
+  userNameText.textContent = userDocCache.profile.name || "User";
+  selectedDateKey = todayKey;
+  selectedMonthKey = todayKey.slice(0, 7);
+  ensureSelectedMonthAndDateInputs();
+  updateStopwatchUI();
+  updatePomodoroUI();
+  adminPanel.classList.add("hidden");
+  await refreshAppUI();
+  showAppScreen();
+  saveSession({ type: "user", docId });
+}
+
+// AUTH TABS
 showLoginBtn.addEventListener("click", () => {
   showLoginBtn.classList.add("active");
   showSignupBtn.classList.remove("active");
@@ -478,103 +592,123 @@ showSignupBtn.addEventListener("click", () => {
   setAuthMessage("");
 });
 
+// SIGNUP
 signupForm.addEventListener("submit", async (e) => {
   e.preventDefault();
-  const name = document.getElementById("signupName").value.trim();
-  const email = document.getElementById("signupEmail").value.trim();
-  const password = document.getElementById("signupPassword").value;
 
-  if (!name || !email || !password) {
+  const name = document.getElementById("signupName").value.trim();
+  const username = document.getElementById("signupUsername").value.trim().toLowerCase();
+  const password = document.getElementById("signupPassword").value.trim();
+
+  if (!name || !username || !password) {
     setAuthMessage("All signup fields are required.");
     return;
   }
 
-  try {
-    const cred = await createUserWithEmailAndPassword(auth, email, password);
-    await updateProfile(cred.user, { displayName: name });
+  if (password.length < 6) {
+    setAuthMessage("Password minimum 6 characters hona chahiye.");
+    return;
+  }
 
-    const ref = doc(db, "studyTrackerUsers", cred.user.uid);
+  if (username === ADMIN_USERNAME.toLowerCase()) {
+    setAuthMessage("Ye username allowed nahi hai.");
+    return;
+  }
+
+  try {
+    const q = query(collection(db, "studyTrackerUsers"), where("profile.username", "==", username));
+    const existing = await getDocs(q);
+
+    if (!existing.empty) {
+      setAuthMessage("Username already exists.");
+      return;
+    }
+
     const newDoc = ensureUserShape({
-      profile: { name, email },
+      profile: {
+        name,
+        username,
+        role: "user",
+      },
+      password,
       stats: { totalSeconds: 0, streakDays: 0, lastStreakDate: "" },
       studyByDate: {},
       tasksByDate: {},
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
     });
 
-    await setDoc(ref, {
+    const added = await addDoc(collection(db, "studyTrackerUsers"), {
       ...newDoc,
+      createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
     });
 
     setAuthMessage("Account created successfully.", true);
+    await loginAsUser(added.id, newDoc);
   } catch (err) {
     setAuthMessage(err.message || "Signup failed.");
   }
 });
 
+// LOGIN
 loginForm.addEventListener("submit", async (e) => {
   e.preventDefault();
-  const email = document.getElementById("loginEmail").value.trim();
-  const password = document.getElementById("loginPassword").value;
+
+  const username = document.getElementById("loginUsername").value.trim().toLowerCase();
+  const password = document.getElementById("loginPassword").value.trim();
+
+  if (!username || !password) {
+    setAuthMessage("Username and password required.");
+    return;
+  }
+
+  if (username === ADMIN_USERNAME.toLowerCase() && password === ADMIN_PASSWORD) {
+    setAuthMessage("Admin login success.", true);
+    await loginAsAdmin();
+    return;
+  }
 
   try {
-    await signInWithEmailAndPassword(auth, email, password);
+    const q = query(
+      collection(db, "studyTrackerUsers"),
+      where("profile.username", "==", username),
+      where("password", "==", password)
+    );
+
+    const snap = await getDocs(q);
+
+    if (snap.empty) {
+      setAuthMessage("Invalid username or password.");
+      return;
+    }
+
+    const docSnap = snap.docs[0];
     setAuthMessage("Login success.", true);
+    await loginAsUser(docSnap.id, docSnap.data());
   } catch (err) {
     setAuthMessage(err.message || "Login failed.");
   }
 });
 
+// LOGOUT
 logoutBtn.addEventListener("click", async () => {
   stopGlobalStopwatch(false);
   stopAllTaskTimers();
   pausePomodoro(false);
-  await signOut(auth);
-});
 
-onAuthStateChanged(auth, async (user) => {
-  currentUser = user;
-  if (!user) {
-    authScreen.classList.remove("hidden");
-    appScreen.classList.add("hidden");
-    userDocCache = null;
-    return;
-  }
-
-  const ref = doc(db, "studyTrackerUsers", user.uid);
-  const snap = await getDoc(ref);
-
-  if (snap.exists()) {
-    userDocCache = ensureUserShape(snap.data());
-  } else {
-    userDocCache = ensureUserShape({
-      profile: {
-        name: user.displayName || "User",
-        email: user.email || "",
-      },
-    });
-
-    await setDoc(ref, {
-      ...userDocCache,
-      updatedAt: serverTimestamp(),
-    });
-  }
-
-  authScreen.classList.add("hidden");
-  appScreen.classList.remove("hidden");
-  userNameText.textContent = userDocCache.profile.name || user.displayName || "User";
-
-  selectedDateKey = todayKey;
-  selectedMonthKey = todayKey.slice(0, 7);
-  ensureSelectedMonthAndDateInputs();
-  updateStopwatchUI();
-  updatePomodoroUI();
-  await refreshAppUI();
+  currentUser = null;
+  currentDocId = null;
+  userDocCache = null;
+  isAdmin = false;
+  clearSession();
+  adminPanel.classList.add("hidden");
+  showAuthScreen();
 });
 
 // STOPWATCH
 async function startGlobalStopwatch() {
-  if (isGlobalRunning) return;
+  if (isGlobalRunning || isAdmin) return;
   isGlobalRunning = true;
   updateStopwatchUI();
 
@@ -681,6 +815,8 @@ enableNotificationBtn.addEventListener("click", async () => {
 
 // TASKS
 addTaskBtn.addEventListener("click", async () => {
+  if (isAdmin) return;
+
   const name = taskNameInput.value.trim();
   const targetMinutes = Number(taskTargetMinutesInput.value || 0);
 
@@ -709,6 +845,8 @@ addTaskBtn.addEventListener("click", async () => {
 });
 
 tasksContainer.addEventListener("click", async (e) => {
+  if (isAdmin) return;
+
   const button = e.target.closest("button[data-action]");
   if (!button) return;
 
@@ -718,13 +856,8 @@ tasksContainer.addEventListener("click", async (e) => {
   const task = tasks.find((t) => t.id === id);
   if (!task) return;
 
-  if (action === "start") {
-    startTaskTimer(task.id);
-  }
-
-  if (action === "stop") {
-    await stopTaskTimer(task.id);
-  }
+  if (action === "start") startTaskTimer(task.id);
+  if (action === "stop") await stopTaskTimer(task.id);
 
   if (action === "done") {
     task.done = !task.done;
@@ -741,7 +874,7 @@ tasksContainer.addEventListener("click", async (e) => {
 });
 
 function startTaskTimer(taskId) {
-  if (activeTaskIntervals.has(taskId)) return;
+  if (activeTaskIntervals.has(taskId) || isAdmin) return;
 
   const interval = setInterval(() => {
     const tasks = getSelectedTasks();
@@ -804,7 +937,7 @@ datePicker.addEventListener("change", () => {
 graphMode.addEventListener("change", renderChart);
 
 // START
-window.addEventListener("load", () => {
+window.addEventListener("load", async () => {
   setTimeout(() => splash.classList.add("hide"), 1800);
   updateLiveClock();
   setInterval(updateLiveClock, 1000);
@@ -813,6 +946,29 @@ window.addEventListener("load", () => {
 
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("./service-worker.js").catch(console.error);
+  }
+
+  const session = getSession();
+  if (!session) return;
+
+  try {
+    if (session.type === "admin") {
+      await loginAsAdmin();
+      return;
+    }
+
+    if (session.type === "user" && session.docId) {
+      const ref = doc(db, "studyTrackerUsers", session.docId);
+      const snap = await getDoc(ref);
+      if (snap.exists()) {
+        await loginAsUser(snap.id, snap.data());
+      } else {
+        clearSession();
+      }
+    }
+  } catch (e) {
+    console.error(e);
+    clearSession();
   }
 });
 
@@ -823,9 +979,3 @@ window.addEventListener("beforeunload", async () => {
     console.error(e);
   }
 });
-
-
-
-
-
-
