@@ -1,124 +1,89 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Pranjal Study Tracker 2026</title>   <link rel="icon" type="image/png" sizes="32x32" href="icon-192.png">
-<link rel="shortcut icon" href="icon-192.png">
-  <link rel="stylesheet" href="style.css" /> <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#0f172a"><meta name="google-site-verification" content="HALRIUWVWs3kOE5eqNP2l8j_FcAaKi1P4Co5SwVJ5wE" />
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Study Tracker 2026</title>
+
+<link rel="stylesheet" href="style.css">
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0f172a">
+
 </head>
-<body>    <div id="splash">
-  <img src="icon-192.png" alt="logo">
-</div>
-  <div class="app">
-    <div class="header">
-      <h1>Study Tracker 2026</h1>
-      <p>Developed by <b>Pranjal Srivastava</b></p>
-    </div>
 
-```
-<!-- RED BOX: Month bar -->
-<div class="month-wrap">
-  <div class="month-title">Months (from current month to Dec 2026)</div>
-  <div id="monthBar" class="month-bar"></div>
+<body>
+
+<div id="intro">
+<h1>Study Tracker</h1>
+<p>Developed by <b>Pranjal Srivastava</b></p>
 </div>
 
-<!-- YELLOW SMALL INFO BAR -->
-<div class="selected-info">
-  <div class="chip-row">
-    <div class="chip">Selected Month: <strong id="selectedMonthText">-</strong></div>
-    <div class="chip">Selected Date: <strong id="selectedDateText">-</strong></div>
-    <div class="chip">Day Study: <strong id="selectedDayHoursText">0.00h</strong></div>
-  </div>
-  <div class="chip">Today: <strong id="todayText">-</strong></div>
+<div id="loginPage">
+
+<h2>Login / Signup</h2>
+
+<input id="username" placeholder="Enter Name">
+
+<input id="password" type="password" placeholder="Enter Password">
+
+<button onclick="login()">Login / Signup</button>
+
 </div>
 
-<div class="main">
-  <!-- LEFT -->
-  <div class="panel">
-    <h2>⏱ Global Study Stopwatch</h2>
-    <p class="sub">
-      यह real stopwatch है. Day study time इसी से count होगा. Task timers तभी चलेंगे जब यह stopwatch चालू हो.
-    </p>
+<div id="app">
 
-    <div class="stopwatch-box">
-      <div id="timeDisplay" class="time-display">00:00:00</div>
+<header>
 
-      <div class="btn-row">
-        <button class="action start" onclick="startGlobalStopwatch()">Start</button>
-        <button class="action stop" onclick="stopGlobalStopwatch()">Stop</button>
-        <button class="action reset" onclick="resetGlobalStopwatch()">Reset</button>
-      </div>
+<h1>Study Tracker 2026</h1>
 
-      <div class="timer-state" id="globalStateText">
-        Global Stopwatch: <span class="off">OFF</span>
-      </div>
-    </div>
+<button onclick="logout()">Logout</button>
 
-    <div class="streak-box">
-      <div class="streak-left">
-        <span id="heartIcon" class="heart">🖤</span>
-        <div class="streak-text">
-          <div class="main-t">4 Hour Streak: <span id="streakCount">0</span> days</div>
-          <div class="sub-t" id="streakSubText">Complete 4 hours on selected day to keep streak</div>
-        </div>
-      </div>
-      <div id="streakTick" class="ok-tick">✔</div>
-    </div>
+</header>
 
-    <div class="task-box">
-      <h3>📝 Daily Tasks (selected date)</h3>
+<section class="timer">
 
-      <div class="task-form">
-        <input id="taskNameInput" type="text" placeholder="Example: Math Complex No 2" />
-        <input id="taskTimerMinInput" type="number" min="1" max="600" placeholder="Timer min" />
-        <button class="add-btn" onclick="addTask()">Add Task</button>
-      </div>
+<h2>Study Timer</h2>
 
-      <ul id="taskList" class="task-list"></ul>
+<div id="time">00:00:00</div>
 
-      <div class="small-note">
-        • Task timer = custom timer only (no stopwatch in task) <br>
-        • Task timer start तभी होगा जब ऊपर वाला global stopwatch ON हो <br>
-        • ✔ button से task complete / uncomplete toggle कर सकते हो
-      </div>
-    </div>
-  </div>
+<button onclick="startTimer()">Start</button>
 
-  <!-- RIGHT (YELLOW BIG BOX: Calendar) -->
-  <div class="panel calendar-panel">
-    <div class="calendar-top">
-      <div class="calendar-title">📅 Calendar</div>
-      <div class="chip">Month View</div>
-    </div>
+<button onclick="pauseTimer()">Pause</button>
 
-    <div id="calendarGrid" class="calendar-grid"></div>
+<button onclick="resetTimer()">Reset</button>
 
-    <div class="legend">
-      <div class="item"><span class="dot today"></span> Today</div>
-      <div class="item"><span class="dot"></span> Other Date</div>
-      <div class="item"><span class="dot done"></span> 4h complete</div>
-      <div class="item"><span class="dot streak"></span> Streak day</div>
-    </div>
-  </div>
+<p>Total Study Hours: <span id="streak">0</span></p>
+
+</section>
+
+<section class="task">
+
+<h2>Goals / Tasks</h2>
+
+<input id="taskInput" placeholder="Add Task">
+
+<button onclick="addTask()">Add</button>
+
+<ul id="taskList"></ul>
+
+</section>
+
+<section>
+
+<h2>Progress</h2>
+
+<canvas id="chart"></canvas>
+
+</section>
+
 </div>
 
-<footer>
-  <div>Developed by Pranjal Srivastava</div>
-  <div>From UP Juthipur</div>
-</footer>
-```
+<script src="chart.js"></script>
 
-  </div>
-
-  <!-- IMPORTANT: script.js end mein -->
-
-  <script src="script.js"></script>
+<script src="script.js"></script>
 
 </body>
 </html>
-<title>Pranjal Study Tracker</title>
-<meta name="description" content="Study focus timer and task tracker app made by Pranjal Srivastava">
-
