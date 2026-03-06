@@ -704,4 +704,12 @@ function renderAll(){
   navigator.serviceWorker.register("./service-worker.js");
 }if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("service-worker.js");
-}
+
+}}window.addEventListener("load", function () {
+  setTimeout(function () {
+    const splash = document.getElementById("splash");
+    if (splash) {
+      splash.style.display = "none";
+    }
+  }, 2000);
+});
