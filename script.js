@@ -1,9 +1,4 @@
-window.addEventListener("load", () => {
-  const splash = document.getElementById("splash");
-  setTimeout(() => {
-    splash.style.display = "none";
-  }, 2000);
-});                 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
+             import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
 import {
   getAuth,
   createUserWithEmailAndPassword,
@@ -828,4 +823,5 @@ window.addEventListener("beforeunload", async () => {
     console.error(e);
   }
 });
+
 
