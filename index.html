@@ -1,89 +1,252 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Study Tracker 2026</title>
-
-<link rel="stylesheet" href="style.css">
-
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#0f172a">
-
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Study Tracker 2026</title>
+  <meta name="theme-color" content="#08142b" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" type="image/png" href="icon-192.png" />
+  <link rel="apple-touch-icon" href="icon-192.png" />
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-
 <body>
+  <div id="splash" class="splash-screen">
+    <div class="splash-card glass">
+      <img src="icon-192.png" alt="Study Tracker Logo" class="splash-logo" />
+      <h1>Study Tracker 2026</h1>
+      <p>Developed by <strong>Pranjal Srivastava</strong></p>
+    </div>
+  </div>
 
-<div id="intro">
-<h1>Study Tracker</h1>
-<p>Developed by <b>Pranjal Srivastava</b></p>
-</div>
+  <div class="bg-orb orb-1"></div>
+  <div class="bg-orb orb-2"></div>
+  <div class="bg-grid"></div>
 
-<div id="loginPage">
+  <div id="authScreen" class="screen auth-screen">
+    <div class="auth-wrap glass">
+      <div class="brand-row">
+        <img src="icon-192.png" alt="logo" class="brand-logo" />
+        <div>
+          <h1>Study Tracker 2026</h1>
+          <p>Developed by <strong>Pranjal Srivastava</strong></p>
+        </div>
+      </div>
 
-<h2>Login / Signup</h2>
+      <div class="auth-tabs">
+        <button id="showLoginBtn" class="tab-btn active" type="button">Login</button>
+        <button id="showSignupBtn" class="tab-btn" type="button">Signup</button>
+      </div>
 
-<input id="username" placeholder="Enter Name">
+      <form id="loginForm" class="auth-form">
+        <div class="field-grid">
+          <div class="field">
+            <label>Email</label>
+            <input id="loginEmail" type="email" placeholder="Enter email" required />
+          </div>
+          <div class="field">
+            <label>Password</label>
+            <input id="loginPassword" type="password" placeholder="Enter password" required />
+          </div>
+        </div>
+        <button type="submit" class="btn primary full">Login</button>
+      </form>
 
-<input id="password" type="password" placeholder="Enter Password">
+      <form id="signupForm" class="auth-form hidden">
+        <div class="field-grid">
+          <div class="field">
+            <label>Full Name</label>
+            <input id="signupName" type="text" placeholder="Enter full name" required />
+          </div>
+          <div class="field">
+            <label>Email</label>
+            <input id="signupEmail" type="email" placeholder="Enter email" required />
+          </div>
+          <div class="field field-full">
+            <label>Password</label>
+            <input id="signupPassword" type="password" placeholder="Min 6 characters" required />
+          </div>
+        </div>
+        <button type="submit" class="btn primary full">Create Account</button>
+      </form>
 
-<button onclick="login()">Login / Signup</button>
+      <p id="authMessage" class="message"></p>
+    </div>
+  </div>
 
-</div>
+  <div id="appScreen" class="screen hidden">
+    <header class="topbar glass">
+      <div class="topbar-left">
+        <img src="icon-192.png" alt="logo" class="top-logo" />
+        <div>
+          <h2>Study Tracker 2026</h2>
+          <p>Developed by <strong>Pranjal Srivastava</strong></p>
+        </div>
+      </div>
 
-<div id="app">
+      <div class="topbar-right">
+        <div class="pill clock-pill">
+          <span id="liveDate">--</span>
+          <span class="dot-sep">•</span>
+          <span id="liveClock">--</span>
+        </div>
+        <div class="pill user-pill">
+          <span id="userNameText">User</span>
+        </div>
+        <button id="enableNotificationBtn" class="btn ghost" type="button">Notifications</button>
+        <button id="logoutBtn" class="btn danger" type="button">Logout</button>
+      </div>
+    </header>
 
-<header>
+    <main class="dashboard">
+      <section class="hero glass">
+        <div>
+          <h1>Study Tracker 2026</h1>
+          <p class="muted">Real time study tracking, monthly graph, calendar, pomodoro, tasks, and cloud account sync.</p>
+        </div>
+      </section>
 
-<h1>Study Tracker 2026</h1>
+      <section class="summary-row">
+        <div class="pill">Selected Month: <strong id="selectedMonthLabel">-</strong></div>
+        <div class="pill">Selected Date: <strong id="selectedDateLabel">-</strong></div>
+        <div class="pill">Day Study: <strong id="selectedDayHours">0.00h</strong></div>
+        <div class="pill">Month Total: <strong id="selectedMonthHours">0.00h</strong></div>
+        <div class="pill">Today: <strong id="todayDateLabel">-</strong></div>
+      </section>
 
-<button onclick="logout()">Logout</button>
+      <section class="controls-row glass">
+        <div class="field month-field">
+          <label for="monthPicker">Open Month</label>
+          <input id="monthPicker" type="month" />
+        </div>
+        <div class="field date-field">
+          <label for="datePicker">Open Date</label>
+          <input id="datePicker" type="date" />
+        </div>
+        <div class="field">
+          <label for="graphMode">Graph View</label>
+          <select id="graphMode">
+            <option value="month">This Month</option>
+            <option value="selected">Selected Month</option>
+          </select>
+        </div>
+      </section>
 
-</header>
+      <section class="content-grid">
+        <div class="left-column">
+          <div class="card glass">
+            <div class="card-head">
+              <h3>⏱ Global Study Stopwatch</h3>
+              <div class="status" id="stopwatchStatus">OFF</div>
+            </div>
+            <p class="muted">Global stopwatch se real study time count hoga. Reset karne par screen timer zero hoga, lekin total saved study hours delete nahi honge.</p>
+            <div class="timer-box">
+              <div id="stopwatchDisplay" class="big-time">00:00:00</div>
+              <div class="timer-actions">
+                <button id="startStopwatchBtn" class="btn success" type="button">Start</button>
+                <button id="pauseStopwatchBtn" class="btn warning" type="button">Pause</button>
+                <button id="resetStopwatchBtn" class="btn secondary" type="button">Reset</button>
+              </div>
+            </div>
+          </div>
 
-<section class="timer">
+          <div class="card glass streak-card">
+            <h3>🖤 4 Hour Streak: <span id="streakDays">0</span> days</h3>
+            <p class="muted">Selected day par 4 hours complete hone par streak count hoga.</p>
+          </div>
 
-<h2>Study Timer</h2>
+          <div class="card glass">
+            <div class="card-head">
+              <h3>🍅 Pomodoro Focus Mode</h3>
+              <div class="status" id="pomodoroStatus">READY</div>
+            </div>
+            <div class="pomodoro-grid">
+              <div class="field">
+                <label>Focus (minutes)</label>
+                <input id="focusMinutes" type="number" min="1" value="25" />
+              </div>
+              <div class="field">
+                <label>Break (minutes)</label>
+                <input id="breakMinutes" type="number" min="1" value="5" />
+              </div>
+            </div>
+            <div class="pomodoro-display" id="pomodoroDisplay">25:00</div>
+            <div class="timer-actions">
+              <button id="startPomodoroBtn" class="btn success" type="button">Start Pomodoro</button>
+              <button id="pausePomodoroBtn" class="btn warning" type="button">Pause</button>
+              <button id="resetPomodoroBtn" class="btn secondary" type="button">Reset</button>
+            </div>
+          </div>
 
-<div id="time">00:00:00</div>
+          <div class="card glass">
+            <div class="card-head">
+              <h3>📝 Daily Tasks (selected date)</h3>
+            </div>
+            <div class="task-form">
+              <input id="taskNameInput" type="text" placeholder="Task name" />
+              <input id="taskTargetMinutesInput" type="number" min="1" placeholder="Target minutes" />
+              <button id="addTaskBtn" class="btn primary" type="button">Add Task</button>
+            </div>
+            <p class="muted">Task timer alag chalega.</p>
+            <div id="tasksContainer" class="tasks-list"></div>
+          </div>
+        </div>
 
-<button onclick="startTimer()">Start</button>
+        <div class="right-column">
+          <div class="card glass">
+            <div class="card-head">
+              <h3>🗓 Calendar</h3>
+              <div class="month-title" id="calendarTitle">Month View</div>
+            </div>
+            <div class="legend-row">
+              <span><i class="legend-dot today-dot"></i> Today</span>
+              <span><i class="legend-dot selected-dot"></i> Selected Date</span>
+              <span><i class="legend-dot complete-dot"></i> 4h complete</span>
+              <span><i class="legend-dot streak-dot"></i> Streak day</span>
+            </div>
+            <div class="weekdays">
+              <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
+            </div>
+            <div id="calendarGrid" class="calendar-grid"></div>
+          </div>
 
-<button onclick="pauseTimer()">Pause</button>
+          <div class="card glass">
+            <div class="card-head">
+              <h3>📊 Daily Study Graph</h3>
+              <div class="month-title" id="graphTitle">Monthly Hours</div>
+            </div>
+            <canvas id="studyChart"></canvas>
+          </div>
 
-<button onclick="resetTimer()">Reset</button>
+          <div class="card glass">
+            <div class="card-head">
+              <h3>📈 Monthly Summary</h3>
+            </div>
+            <div class="summary-stats">
+              <div class="mini-stat">
+                <span class="mini-label">Today</span>
+                <strong id="todayHoursValue">0.00h</strong>
+              </div>
+              <div class="mini-stat">
+                <span class="mini-label">Selected Day</span>
+                <strong id="selectedDayHoursValue">0.00h</strong>
+              </div>
+              <div class="mini-stat">
+                <span class="mini-label">Selected Month</span>
+                <strong id="selectedMonthHoursValue">0.00h</strong>
+              </div>
+              <div class="mini-stat">
+                <span class="mini-label">Total Cloud Hours</span>
+                <strong id="totalCloudHoursValue">0.00h</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
 
-<p>Total Study Hours: <span id="streak">0</span></p>
-
-</section>
-
-<section class="task">
-
-<h2>Goals / Tasks</h2>
-
-<input id="taskInput" placeholder="Add Task">
-
-<button onclick="addTask()">Add</button>
-
-<ul id="taskList"></ul>
-
-</section>
-
-<section>
-
-<h2>Progress</h2>
-
-<canvas id="chart"></canvas>
-
-</section>
-
-</div>
-
-<script src="chart.js"></script>
-
-<script src="script.js"></script>
-
+  <script type="module" src="script.js"></script>
 </body>
 </html>
